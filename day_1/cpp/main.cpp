@@ -1,23 +1,12 @@
+#include "../../common/cpp/load_data.h"
+
 #include <iostream>
-#include <fstream>
 #include <vector>
 #include <string>
 #include <numeric>
 
-#include <cstdlib>
-
 namespace
 {
-  std::vector<int> load_values_from_path(const std::string& path)
-  {
-    std::vector<int> out;
-    std::ifstream fs(path);
-    std::string line;
-    while (std::getline(fs, line))
-      out.emplace_back(std::atoi(line.c_str()));
-    return out;
-  }
-
   template<typename T>
   size_t count_increases(std::vector<T> values)
   {
@@ -59,7 +48,7 @@ namespace
 
 int main()
 {
-  auto values = load_values_from_path("../data");
+  auto values = load_data::parse_string<int>(load_data::load_file("../data"));;
 
   std::cout << "Part 1: Number of time the measurement increases"
             << std::endl
