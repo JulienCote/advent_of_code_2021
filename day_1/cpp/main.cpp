@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <numeric>
+
 #include <cstdlib>
 
 namespace
@@ -31,18 +33,26 @@ namespace
   template<typename T>
   std::vector<T> get_sliding_windows(std::vector<T> values, size_t window_size)
   {
-    if (window_size == 0)
-      throw std::domain_error("window_size must be greater than 0");
+    if (window_size == 0 || window_size > values.size())
+      throw std::domain_error("window_size must be greater than 0 and not larger than the number of elements");
 
     std::vector<T> out;
     out.reserve(values.size() - (window_size - 1));
-    for (size_t i = 0; i < values.size() - (window_size - 1); ++i)
+
+    size_t begin = 0;
+    size_t end = window_size;
+    T current_window = std::accumulate(values.begin(), values.begin() + (end - 1), static_cast<T>(0));
+    out.emplace_back(current_window);
+
+    for (size_t i = 1; i < values.size() - (window_size - 1); ++i)
     {
-      T val = 0;
-      for (size_t j = 0; j < window_size; ++j)
-        val += values[i+j];
-      out.emplace_back(val);
+      current_window -= values[begin];
+      current_window += values[end];
+      out.emplace_back(current_window);
+      ++begin;
+      ++end;
     }
+
     return out;
   }
 }
