@@ -24,4 +24,4 @@ second_star:{[data]
 -1 "First start value is: ", string first_star[data];
 -1 "Second start value is: ", string second_star[data];
 
-/exit 0
+exit 0
