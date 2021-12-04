@@ -24,7 +24,7 @@ namespace load_data
   }
 
   // This functions flips the values to become columnar. "a,1\nb,2" becomes {{"a","b"},{"1","2"}}
-  // This assumes a fixed number of columns accross rows
+  // This assumes a fixed number of columns across rows
   std::vector<std::vector<std::string>> load_file(const std::string& path, char field_delimiter, size_t field_count)
   {
     std::vector<std::vector<std::string>> out;
