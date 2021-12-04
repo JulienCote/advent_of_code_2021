@@ -47,7 +47,7 @@ namespace
       else if (a == "forward")
       {
         horizontal += values[i];
-        depth += values[1] * aim;
+        depth += values[i] * aim;
       }
       else
       {
@@ -60,7 +60,7 @@ namespace
 
 int main()
 {
-  auto file = load_data::load_file("../data", ' ', 2);
+  auto file = load_data::load_file_csv("../data", ' ');
   std::vector<std::string> actions = std::move(file[0]);
   std::vector<int> values = load_data::parse_string<int>(file[1]);
 

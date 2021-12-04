@@ -13,6 +13,13 @@
 
 namespace load_data
 {
+  template<typename Stream>
+  void skip_first_n(Stream& stream, size_t first_line, char delim)
+  {
+    while (first_line--) // skip until first line we care about
+      stream.ignore(std::numeric_limits<std::streamsize>::max()), delim;
+  }
+
   std::vector<std::string> load_file(const std::string& path)
   {
     std::vector<std::string> out;
@@ -23,13 +30,28 @@ namespace load_data
     return out;
   }
 
-
-  // This functions flips the values to become columnar. "a,1\nb,2" becomes {{"a","b"},{"1","2"}}
-  // This assumes a fixed number of columns across rows
-  std::vector<std::vector<std::string>> load_file(const std::string& path, char field_delimiter, size_t field_count)
+  std::vector<std::vector<std::string>> load_file(const std::string& path, char field_delimiter, size_t first_line, size_t last_line)
   {
     std::vector<std::vector<std::string>> out;
-    out.resize(field_count);
+    std::ifstream fs(path);
+    skip_first_n(fs, first_line, '\n'); // skip lines until at first_line
+
+    std::string line;
+    while (first_line++ < last_line && std::getline(fs, line, '\n')) // until last_line or out of lines in file
+    {
+      out.emplace_back();
+      std::stringstream ss(std::move(line));
+      std::string field;
+      while (std::getline(ss, field, field_delimiter))
+        out.back().emplace_back(std::move(field));
+    }
+    return out;
+  }
+
+  // This functions flips the values to become columnar. "a,1\nb,2" becomes {{"a","b"},{"1","2"}}
+  std::vector<std::vector<std::string>> load_file_csv(const std::string& path, char field_delimiter)
+  {
+    std::vector<std::vector<std::string>> out;
     std::ifstream fs(path);
     std::string line;
     while (std::getline(fs, line, '\n'))
@@ -38,12 +60,40 @@ namespace load_data
       std::string field;
       size_t at_field = 0;
       while (std::getline(ss, field, field_delimiter))
+      {
+        if (out.size() == at_field)
+          out.emplace_back();
         out[at_field++].emplace_back(std::move(field));
+      }
     }
     return out;
   }
 
-  //similar to load_file(std::string, char, size_t) but each char is a field, instead of using a delim
+  std::vector<std::vector<std::vector<std::string>>> load_file_by_blocks(const std::string& path, char field_delimiter, size_t first_line, size_t last_line)
+  {
+    std::vector<std::vector<std::vector<std::string>>> out;
+    out.emplace_back(); //start with a first block
+
+    std::ifstream fs(path);
+    skip_first_n(fs, first_line, '\n'); // skip lines until at first_line
+
+    std::string line;
+    while (std::getline(fs, line, '\n'))
+    {
+      if (line.empty()) //then start new block
+        out.emplace_back();
+      else // then add new line to last block
+        out.back().emplace_back();
+
+      std::stringstream ss(std::move(line));
+      std::string field;
+      while (std::getline(ss, field, field_delimiter))
+        out.back().back().emplace_back(std::move(field));
+    }
+    return out;
+  }
+
+  //similar to load_file_csv(std::string, char) but each char is a field, instead of using a delim. No flip
   std::vector<std::vector<char>> load_file_single_char(const std::string& path)
   {
     std::vector<std::vector<char>> out;
