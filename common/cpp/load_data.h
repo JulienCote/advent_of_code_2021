@@ -17,7 +17,7 @@ namespace load_data
   void skip_first_n(Stream& stream, size_t first_line, char delim)
   {
     while (first_line--) // skip until first line we care about
-      stream.ignore(std::numeric_limits<std::streamsize>::max()), delim;
+      stream.ignore(std::numeric_limits<std::streamsize>::max(), delim);
   }
 
   std::vector<std::string> load_file(const std::string& path)
@@ -81,14 +81,24 @@ namespace load_data
     while (std::getline(fs, line, '\n'))
     {
       if (line.empty()) //then start new block
-        out.emplace_back();
+      {
+        if (!out.back().empty())
+          out.emplace_back();
+        continue;
+      }
       else // then add new line to last block
+      {
         out.back().emplace_back();
+      }
 
       std::stringstream ss(std::move(line));
       std::string field;
       while (std::getline(ss, field, field_delimiter))
+      {
+        if (field.empty() && field_delimiter == ' ') // extra spaces are sometimes used to align visually
+          continue;
         out.back().back().emplace_back(std::move(field));
+      }
     }
     return out;
   }
