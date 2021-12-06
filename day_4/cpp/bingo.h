@@ -12,7 +12,6 @@ class Bingo
     {
       m_row_picked.fill(0);
       m_line_picked.fill(0);
-      m_values.reserve(m_x * m_y);
       m_values_index.reserve(m_x * m_y);
 
       for (size_t i = 0; i < m_x * m_y; ++i)
@@ -20,7 +19,7 @@ class Bingo
         size_t x = get_x_from_idx(i);
         size_t y = get_y_from_idx(i);
         const auto& v = grid[y][x];
-        m_values.emplace_back(v);
+        m_values[i] = v;
         m_values_index.emplace(v, i); // TODO? If insertion fails then we have an invalid board(repeated number)
       }
     }
@@ -92,15 +91,13 @@ class Bingo
     }
 
   private:
-    std::vector<T> m_values; // flat representation of the grid
+    static constexpr size_t m_x = SIZE_X; // grid size along x-axis
+    static constexpr size_t m_y = SIZE_Y; // grid size along y-axis
+    std::array<T, m_x * m_y> m_values; // flat representation of the grid
+    std::array<T, m_x> m_row_picked;  // sums per row
+    std::array<T, m_y> m_line_picked; // sums per line
     std::unordered_map<T, size_t> m_values_index; // track where in the vector each value is
 
     bool m_has_won = false;
     T m_score = 0;
-
-  private:
-    static constexpr size_t m_x = SIZE_X; // grid size along x-axis
-    static constexpr size_t m_y = SIZE_Y; // grid size along y-axis
-    std::array<T, m_x> m_row_picked;  // sums per row
-    std::array<T, m_y> m_line_picked; // sums per line
 };

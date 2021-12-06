@@ -22,8 +22,6 @@ int main()
     bingos.emplace_back(std::move(g));
   }
 
-  bingos.front().print_values();
-
   int first_score = 0;
   int last_score = 0;
   bool winner_found = false;
@@ -33,7 +31,6 @@ int main()
     {
       if(bingo.draw_number(move))
       {
-        std::cout << " Winning move: " << move << std::endl;
         if (!winner_found)
           first_score = bingo.get_score();
         last_score = bingo.get_score();
