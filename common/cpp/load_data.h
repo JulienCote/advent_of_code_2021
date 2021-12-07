@@ -134,7 +134,7 @@ namespace load_data
         if constexpr (std::is_same_v<T_OUT, bool>)
           out.emplace_back(!(str == "0" || strcasecmp(str.c_str(), "false")));
         else if(std::is_integral_v<T_OUT>)
-          out.emplace_back(std::atoi(str.c_str()));
+          out.emplace_back(std::stoi(str));
         else if (std::is_floating_point_v<T_OUT>)
           out.emplace_back(std::stod(str));
       }
