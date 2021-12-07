@@ -6,8 +6,7 @@
 #include <numeric>
 #include <regex>
 
-#include <unordered_map>
-
+#include <algorithm>
 
 namespace
 {
