@@ -10,14 +10,20 @@
 
 namespace
 {
-  int get_triangular_sum(int n)
+  // first solution with recursion/cache, then I learned math existed
+  int get_triangular_sum_rec(int n)
   {
     static std::vector<int> cache {0, 1};
     if (cache.size() > n)
       return cache[n];
-    int new_sum = n + get_triangular_sum(n - 1);
+    int new_sum = n + get_triangular_sum_rec(n - 1);
     cache.emplace_back(new_sum);
     return new_sum;
+  }
+  
+  int get_triangular_sum(int n)
+  {
+    return n * (n + 1) / 2;
   }
 
   // assumes sorted crabs
@@ -39,15 +45,16 @@ namespace
     const int max_crab = crabs.back();
     const int crabRange = max_crab - min_crab;
 
+    //TODO: should be able to do a binary search. The outputs should be quadratically distributed around the answer
     std::vector<int> gas_sums_by_position;
-    gas_sums_by_position.resize(crabRange);
+    gas_sums_by_position.resize(crabRange + 1);
 
     for (auto c : crabs)
     {
-      for (int i = c; i >= min_crab; --i)
+      for (int i = c; i > min_crab; --i)
         gas_sums_by_position[i] += get_triangular_sum(std::abs(c - i));
 
-      for (int i = c; i <= max_crab; ++i)
+      for (int i = c; i < max_crab; ++i)
         gas_sums_by_position[i] += get_triangular_sum(std::abs(c - i));
     }
 
@@ -63,5 +70,4 @@ int main()
 
   std::cout << "First Answer: " << first_star(crabs) << std::endl;
   std::cout << "Second Answer: " << second_star(crabs) << std::endl;
-
 }
