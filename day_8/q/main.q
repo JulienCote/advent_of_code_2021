@@ -16,6 +16,6 @@ second_star:{[data]
   }
 
 -1 "First start value is: ", string first_star[data];
--1 "Second start value is: ", string second_star[data]; / this is too big and won't complete ever, maybe
+-1 "Second start value is: ", string second_star[data];
 
 exit 0
