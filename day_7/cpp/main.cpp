@@ -12,15 +12,11 @@ namespace
 {
   int get_triangular_sum(int n)
   {
-    static std::unordered_map<int, int> cache {{0,0}, {1,1}};
-    auto cacheIt = cache.find(n);
-    if (cacheIt != cache.end())
-    {
-      // std::cout << "found triangle for n: " << n << " at: " << cacheIt->second << std::endl;
-      return cacheIt->second;
-    }
+    static std::vector<int> cache {0, 1};
+    if (cache.size() > n)
+      return cache[n];
     int new_sum = n + get_triangular_sum(n - 1);
-    cache.emplace_hint(cacheIt, n, new_sum);
+    cache.emplace_back(new_sum);
     return new_sum;
   }
 
