@@ -11,20 +11,20 @@
 namespace
 {
   // fun bruteforce with many flavours of <algorithm>
-  size_t first_star(std::vector<int> fishes, size_t day_count)
+  long first_star(std::vector<int> fishes, size_t day_count)
   {
     while (day_count--)
     {
       std::for_each(fishes.begin(), fishes.end(), [](auto& f){ f -= 1; });
-      const size_t births = std::count_if(fishes.cbegin(), fishes.cend(), [](const auto& f){ return f == -1; });
+      const int births = std::count_if(fishes.cbegin(), fishes.cend(), [](const auto& f){ return f == -1; });
       std::replace_if(fishes.begin(), fishes.end(), [](const auto& f){ return f == -1; }, 6);
       std::generate_n(std::back_inserter(fishes), births, [](){ return 8; });
     }
-    return fishes.size();
+    return static_cast<int>(fishes.size()); // yes it fits
   }
 
   // actually do something clever -> aggregate fishes and batch-process them
-  size_t second_star(std::vector<int> fishes, size_t day_count)
+  long second_star(std::vector<int> fishes, size_t day_count)
   {
     constexpr size_t baby_start_at = 8;
     constexpr size_t post_birth_at = 6;
