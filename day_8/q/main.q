@@ -9,7 +9,6 @@ first_star:{[data]
   :sum abs data - final_position
   }
 
-/ TODO: implement this
 second_star:{[data]
   min_data:sums each 1 + til each abs data - min data;
   max_data:sums each 1 + til each abs data - max data;
