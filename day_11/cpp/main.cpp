@@ -25,7 +25,7 @@ namespace
   template <typename T, size_t X, size_t Y>
   long second_star(OctopusFlash<T,X,Y> octopodes)
   {
-    constexpr size_t octopodes_count = octopodes.get_octopus_count();
+    constexpr size_t octopodes_count = octopodes.size();
 
     size_t step_count = 0;
     do //assumes the initial state is never perfectly aligned
