@@ -14,6 +14,8 @@ enum class AdjacencyType
   ORDINAL,  // diagonals inbetween Cardinal directions
 }; // can be combined to represent all 8 directions
 
+// TODO: should probably define long/complex types for readability's sake
+
 template <typename T, size_t X, size_t Y, AdjacencyType ...AdjTypes>
 class AdjacencyGrid
 {
@@ -71,10 +73,13 @@ class AdjacencyGrid
 
     static constexpr short neighbour_count()
     {
-      return (get_neighbour_size(AdjTypes) + ... + 0);
+      return (get_neighbour_size(AdjTypes) + ...);
     }
 
-    static constexpr void get_neighbour_offset_by_cardinality(const AdjacencyType& type, std::array<std::pair<short, short>, neighbour_count()>& offsets, size_t& at)
+    static constexpr void get_neighbour_offset_by_cardinality(
+      const AdjacencyType& type, std::array<std::pair<short, short>,
+      neighbour_count()>& offsets,
+      size_t& at)
     {
       if (type == AdjacencyType::CARDINAL)
       {
@@ -102,10 +107,9 @@ class AdjacencyGrid
       return offsets;
     }
 
-
     static constexpr std::array<size_t, neighbour_count()> get_adjacent_cells_at(size_t index)
     {
-      std::array<std::pair<short, short>, neighbour_count()> offsets = get_neighbour_offsets();
+      const std::array<std::pair<short, short>, neighbour_count()> offsets = get_neighbour_offsets();
 
       std::array<size_t, neighbour_count()> cells;
       const size_t x = get_x_from_index(index);
