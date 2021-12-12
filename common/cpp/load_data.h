@@ -30,7 +30,11 @@ namespace load_data
     return out;
   }
 
-  std::vector<std::vector<std::string>> load_file(const std::string& path, char field_delimiter, size_t first_line, size_t last_line)
+  std::vector<std::vector<std::string>> load_file(
+    const std::string& path,
+    char field_delimiter,
+    size_t first_line = 0,
+    size_t last_line = std::numeric_limits<size_t>::max())
   {
     std::vector<std::vector<std::string>> out;
     std::ifstream fs(path);
@@ -69,7 +73,11 @@ namespace load_data
     return out;
   }
 
-  std::vector<std::vector<std::vector<std::string>>> load_file_by_blocks(const std::string& path, char field_delimiter, size_t first_line, size_t last_line)
+  std::vector<std::vector<std::vector<std::string>>> load_file_by_blocks(
+    const std::string& path,
+    char field_delimiter,
+    size_t first_line = 0,
+    size_t last_line = std::numeric_limits<size_t>::max())
   {
     std::vector<std::vector<std::vector<std::string>>> out;
     out.emplace_back(); //start with a first block
