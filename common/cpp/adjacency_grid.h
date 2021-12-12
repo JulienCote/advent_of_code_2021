@@ -8,7 +8,13 @@
 #include <type_traits>
 #include <utility>
 
-template <typename T, size_t X, size_t Y>
+enum class AdjacencyType
+{
+  CARDINAL, // up, down, left, right
+  ORDINAL,  // diagonals inbetween Cardinal directions
+}; // can be combined to represent all 8 directions
+
+template <typename T, size_t X, size_t Y, AdjacencyType ...AdjTypes>
 class AdjacencyGrid
 {
   protected:
@@ -25,6 +31,10 @@ class AdjacencyGrid
   protected:
     explicit AdjacencyGrid(const std::vector<std::vector<T>>& values)
     {
+      // TODO: Validate that all AdjacencyTypes passed are unique
+      static_assert(sizeof...(AdjTypes) <= 2, "Can't have more AdjacencyType than there are types");
+      static_assert(sizeof...(AdjTypes) > 0, "Must have at least one AdjacencyType");
+
       size_t at = 0;
       for (const auto& row : values)
       {
@@ -32,8 +42,6 @@ class AdjacencyGrid
           m_grid[at++] = v;
       }
     }
-
-    std::array<T, m_grid_size> m_grid; //1D representation of the grid
 
     static constexpr bool is_index_valid(size_t index)
     {
@@ -50,14 +58,56 @@ class AdjacencyGrid
       return index / X;
     }
 
-    static constexpr std::array<size_t, 8> get_adjacent_coordinates_at(size_t index)
-    {
-      std::array<std::pair<short, short>, 8> offsets {{
-        {-1, -1}, {0, -1}, {1, -1},
-        {-1,  0},          {1,  0},
-        {-1,  1}, {0,  1}, {1,  1}}};
+    std::array<T, m_grid_size> m_grid; //1D representation of the grid
 
-      std::array<size_t, 8> coordinates;
+  private:
+    static constexpr short get_neighbour_size(AdjacencyType adjacencyType)
+    {
+      if (adjacencyType == AdjacencyType::CARDINAL)
+        return 4;
+      else if (adjacencyType == AdjacencyType::ORDINAL)
+        return 4;
+    }
+
+    static constexpr short neighbour_count()
+    {
+      return (get_neighbour_size(AdjTypes) + ... + 0);
+    }
+
+    static constexpr void get_neighbour_offset_by_cardinality(const AdjacencyType& type, std::array<std::pair<short, short>, neighbour_count()>& offsets, size_t& at)
+    {
+      if (type == AdjacencyType::CARDINAL)
+      {
+        offsets[at++] = {0, 1};
+        offsets[at++] = {1, 0};
+        offsets[at++] = {0, -1};
+        offsets[at++] = {-1, 0};
+      }
+      else if (type == AdjacencyType::ORDINAL)
+      {
+        offsets[at++] = {1, 1};
+        offsets[at++] = {1, -1};
+        offsets[at++] = {-1, -1};
+        offsets[at++] = {-1, 1};
+      }
+    }
+
+    static constexpr std::array<std::pair<short, short>, neighbour_count()> get_neighbour_offsets()
+    {
+      const auto adjencyTypes = {AdjTypes...};
+      std::array<std::pair<short, short>, neighbour_count()> offsets;
+      size_t at = 0;
+      for (const auto& type : adjencyTypes)
+        get_neighbour_offset_by_cardinality(type, offsets, at);
+      return offsets;
+    }
+
+
+    static constexpr std::array<size_t, neighbour_count()> get_adjacent_cells_at(size_t index)
+    {
+      std::array<std::pair<short, short>, neighbour_count()> offsets = get_neighbour_offsets();
+
+      std::array<size_t, neighbour_count()> cells;
       const size_t x = get_x_from_index(index);
       const size_t y = get_y_from_index(index);
 
@@ -68,22 +118,23 @@ class AdjacencyGrid
         const size_t new_x = x + o_x;
         const size_t new_y = y + o_y;
         if (new_x >= X || new_y >= Y) // no value if any index is beyond the board
-          coordinates[i] = std::numeric_limits<size_t>::max();
+          cells[i] = std::numeric_limits<size_t>::max();
         else
-          coordinates[i] = new_x + (X * new_y);
+          cells[i] = new_x + (X * new_y);
       }
 
-      return coordinates;
+      return cells;
     }
 
-    static constexpr std::array<std::array<size_t, 8>, m_grid_size> get_all_adjacent_coordinates()
+    static constexpr std::array<std::array<size_t, neighbour_count()>, m_grid_size> get_all_adjacent_cells()
     {
-      std::array<std::array<size_t, 8>, m_grid_size> coordinates;
+      std::array<std::array<size_t, neighbour_count()>, m_grid_size> cells;
       for (size_t i = 0; i < m_grid_size; ++i)
-        coordinates[i] = get_adjacent_coordinates_at(i);
-      return coordinates;
+        cells[i] = get_adjacent_cells_at(i);
+      return cells;
     }
 
+  protected:
     // TODO: replace with std::array<std::vector<size_t>, m_grid_size> when constexpr std::vector support exists in gcc or clang
-    static constexpr std::array<std::array<size_t, 8>, m_grid_size> m_adjacent_coordinates_per_index = get_all_adjacent_coordinates();
+    static constexpr std::array<std::array<size_t, neighbour_count()>, m_grid_size> m_adjacent_cells_per_index = get_all_adjacent_cells();
 };

@@ -13,8 +13,8 @@
 
 namespace
 {
-  template <typename T, size_t X, size_t Y>
-  int first_star(OctopusFlash<T,X,Y> octopodes, size_t number_steps)
+  template <typename T, size_t X, size_t Y, AdjacencyType ...AdjTypes>
+  int first_star(OctopusFlash<T,X,Y,AdjTypes...> octopodes, size_t number_steps)
   {
     while (number_steps--)
       octopodes.step_forward();
@@ -22,8 +22,8 @@ namespace
     return octopodes.get_flash_count();
   }
 
-  template <typename T, size_t X, size_t Y>
-  long second_star(OctopusFlash<T,X,Y> octopodes)
+  template <typename T, size_t X, size_t Y, AdjacencyType ...AdjTypes>
+  long second_star(OctopusFlash<T,X,Y,AdjTypes...> octopodes)
   {
     constexpr size_t octopodes_count = octopodes.size();
 
@@ -45,7 +45,7 @@ int main()
   for (const auto& line : lines)
     starting_energy_levels.emplace_back(load_data::parse_string<short>(line));
 
-  OctopusFlash<short, 10, 10> octopodes(starting_energy_levels, 10);
+  OctopusFlash<short, 10, 10, AdjacencyType::CARDINAL, AdjacencyType::ORDINAL> octopodes(starting_energy_levels, 10);
 
   std::cout << "First Answer: " << first_star(octopodes, 100) << std::endl;
   std::cout << "Second Answer: " << second_star(octopodes) << std::endl;

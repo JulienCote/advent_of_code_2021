@@ -2,20 +2,14 @@
 
 #include "../../common/cpp/adjacency_grid.h"
 
-#include <array>
-#include <vector>
-#include <limits>
-#include <type_traits>
-#include <utility>
-
-template <typename T, size_t X, size_t Y>
-class OctopusFlash : public AdjacencyGrid<T,X,Y>
+template <typename T, size_t X, size_t Y, AdjacencyType ...AdjTypes>
+class OctopusFlash : public AdjacencyGrid<T,X,Y,AdjTypes...>
 {
   public:
     OctopusFlash() = delete;
 
     explicit OctopusFlash(const std::vector<std::vector<T>>& starting_energy_levels, T octopus_activates_at)
-      : AdjacencyGrid<T,X,Y>(starting_energy_levels)
+      : AdjacencyGrid<T,X,Y,AdjTypes...>(starting_energy_levels)
       , m_octopus_activates_at(std::move(octopus_activates_at))
     {
       static_assert(std::is_integral_v<T>);
@@ -57,10 +51,10 @@ class OctopusFlash : public AdjacencyGrid<T,X,Y>
     void activate_octopus(size_t index)
     {
       ++m_flash_count;
-      const auto& adjacent_indices = this->m_adjacent_coordinates_per_index[index];
+      const auto& adjacent_indices = this->m_adjacent_cells_per_index[index];
       for (const auto& adjacent_index : adjacent_indices)
       {
-        if (!this->is_index_valid(adjacent_index)) // invalid coordinate(ie, the current vallue is at an edge), so skip it
+        if (!this->is_index_valid(adjacent_index)) // invalid cell(ie, the current vallue is at an edge), so skip it
           continue;
         if (++this->m_grid[adjacent_index] == m_octopus_activates_at)
           activate_octopus(adjacent_index);
