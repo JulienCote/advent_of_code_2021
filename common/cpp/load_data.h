@@ -126,8 +126,10 @@ namespace load_data
     {
       if constexpr (std::is_same_v<T_IN, char>)
       {
-        out.emplace_back(str != '0');
-        continue;
+        if constexpr (std::is_same_v<T_OUT, bool>)
+          out.emplace_back(str != '0');
+        else if (std::is_integral_v<T_OUT>)
+          out.emplace_back(str - '0');
       }
       else
       {
