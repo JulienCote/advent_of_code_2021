@@ -151,4 +151,25 @@ namespace load_data
     }
     return out;
   }
+
+  std::vector<std::string> split(const std::string& str, char delim)
+  {
+    std::vector<std::string> out;
+
+    size_t last_found = 0;
+    for (size_t i = 0; i < str.length(); ++i)
+    {
+      if (str[i] == delim)
+      {
+        if (i != last_found) //don't insert empty strings if the whole match is delim
+          out.emplace_back(std::string(str.begin() + last_found, str.begin() + i));
+        last_found = i + 1;
+      }
+    }
+
+    //insert whole string if no nelim is found, or insert the last element otherwise
+    out.emplace_back(std::string(str.begin() + last_found, str.begin() + str.size()));
+
+    return out;
+  }
 }
