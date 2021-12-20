@@ -86,7 +86,7 @@ namespace load_data
     skip_first_n(fs, first_line, '\n'); // skip lines until at first_line
 
     std::string line;
-    while (std::getline(fs, line, '\n'))
+    while (first_line++ < last_line && std::getline(fs, line, '\n'))
     {
       if (line.empty()) //then start new block
       {
@@ -112,12 +112,17 @@ namespace load_data
   }
 
   //similar to load_file_csv(std::string, char) but each char is a field, instead of using a delim. No flip
-  std::vector<std::vector<char>> load_file_single_char(const std::string& path)
+  std::vector<std::vector<char>> load_file_single_char(const std::string& path,
+                                                       size_t first_line = 0,
+                                                       size_t last_line = std::numeric_limits<size_t>::max())
   {
     std::vector<std::vector<char>> out;
     std::ifstream fs(path);
+
+    skip_first_n(fs, first_line, '\n'); // skip lines until at first_line
+
     std::string line;
-    while (std::getline(fs, line))
+    while (first_line++ < last_line && std::getline(fs, line))
     {
       out.emplace_back();
       for (size_t i = 0; i < line.length(); ++i)
