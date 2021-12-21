@@ -60,6 +60,11 @@ class AdjacencyGrid
       return index / X;
     }
 
+    static constexpr size_t get_index_from_coordinates(size_t x, size_t y)
+    {
+      return x + (X * y);
+    }
+
     std::array<T, m_grid_size> m_grid; //1D representation of the grid
 
   private:
@@ -77,8 +82,8 @@ class AdjacencyGrid
     }
 
     static constexpr void get_neighbour_offset_by_cardinality(
-      const AdjacencyType& type, std::array<std::pair<short, short>,
-      neighbour_count()>& offsets,
+      const AdjacencyType& type,
+      std::array<std::pair<short, short>, neighbour_count()>& offsets,
       size_t& at)
     {
       if (type == AdjacencyType::CARDINAL)
@@ -124,7 +129,7 @@ class AdjacencyGrid
         if (new_x >= X || new_y >= Y) // no value if any index is beyond the board
           cells[i] = std::numeric_limits<size_t>::max();
         else
-          cells[i] = new_x + (X * new_y);
+          cells[i] = get_index_from_coordinates(new_x, new_y);
       }
 
       return cells;

@@ -6,8 +6,6 @@ template <typename T, size_t X, size_t Y, AdjacencyType ...AdjTypes>
 class OctopusFlash : public AdjacencyGrid<T,X,Y,AdjTypes...>
 {
   public:
-    OctopusFlash() = delete;
-
     explicit OctopusFlash(const std::vector<std::vector<T>>& starting_energy_levels, T octopus_activates_at)
       : AdjacencyGrid<T,X,Y,AdjTypes...>(starting_energy_levels)
       , m_octopus_activates_at(std::move(octopus_activates_at))
