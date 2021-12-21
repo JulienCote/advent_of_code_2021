@@ -30,6 +30,7 @@ class ChitonNavigator final : public AdjacencyGrid<T,X,Y,AdjacencyType::CARDINAL
   private:
     // start from the end, backtrack to the begining computing at each step the cost to reach the end
     // store the best(lowest) cost of each index
+    // TODO: fix it with the from/to cache optimizations
     long backtrack_risk(size_t location,
                         size_t destination,
                         std::unordered_map<size_t, long>& risk_from_start,
